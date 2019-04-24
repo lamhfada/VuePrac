@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/1.0.18/vue.min.js"></script>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+
+<title>Let us pray!</title>
+</head>
+<style>
+
+</style>
+<body>
+<div class="container-fluid">
+	
+	<div id="blog-posts-events-demo">
+	  <div :style="{ fontSize: postFontSize + 'em' }">
+	    <blog-post
+	      v-for="post in posts"
+	      v-bind:key="post.id"
+	      v-bind:post="post"
+	      v-on:enlarge-text="postFontSize += 0.1"
+	    ></blog-post>
+	  </div>
+	</div>
+	<div id="AddNewProp">
+		<p>{{ name }}</p>
+		<p>{{ age }}</p>
+		<p>{{ favoriteColor }}</p>
+	</div>
+	<button onclick="add()">Add some</button>
+	
+	<br/>
+	<div id="app">
+	  <!-- 子組件 -->
+	  <!-- 父組件直接用 v-on 來監聽子組件觸發的事件。 -->
+	  <!-- 需跟子組件中的$emit組合使用    v-on:son_method="father_method" -->
+	  <mycon v-on:son_method_trigged="father_method"></mycon>
+	</div>
+	<div id="ddd">
+		<select v-model="selected">
+		  <option v-for="option in options" v-bind:value="option.value">
+		    {{ option.text }}
+		  </option>
+		</select>
+		<span>Selected: {{ selected }}</span>
+	</div>
+</div>
+<script>
+
+new Vue({
+	  el: '#ddd',
+	  data: {
+	    selected: 'A',
+	    options: [
+	      { text: 'One', value: 'A' },
+	      { text: 'Two', value: 'B' },
+	      { text: 'Three', value: 'C' }
+	    ]
+	  }
+	})
+Vue.component('blog-post', {
+	  props: ['post'],
+	  template: `
+	    <div class="blog-post">
+	      <h3 >{{ post.title }}</h3>
+	      <button v-on:click="$emit('enlarge-text')">
+	        Enlarge text
+	      </button>
+	      <div v-html="post.content"></div>
+	      <div v-html="post.name"></div>
+	      <div v-html="post.weight"></div>
+	    </div>
+	  `
+	})
+	
+new Vue({
+  el: '#blog-posts-events-demo',
+  data: {
+    posts: [{  id: 1, title:"12412",
+    		   content: "This is Content",
+    		   weight : 40
+    		}
+    		,{id: 2, title:"Implement", content: "HAHA", name: "Tifa"}],
+    postFontSize: 1
+  }
+})
+
+var user = new Vue({
+	el: '#AddNewProp',
+	data:{
+		name: "Tifa"		
+	}
+})
+function add(){
+	//Vue.set(user, 'weight', 27)
+	user = Object.assign({}, user, {
+		  age: 27,
+		  favoriteColor: 'Vue Green'
+		})
+	console.log(user);
+}
+
+Vue.component('mycon', {
+	  template: `<button v-on:click="son_method">子按鈕</button>`,
+	  methods: {
+	  	// 按鈕點擊時候觸發事件
+	    son_method: function () {
+	      this.counter += 1;
+	 	  console.log("son");
+	 	  console.log(this.counter);
+	      // 這句話來觸發事件
+	      // 必須跟模板中的v-on配合使用
+	      this.$emit('son_method_trigged');
+	    }
+	  },
+	});
+
+	// 父組件
+	new Vue({
+	  el: "#app",
+	  methods: {
+	    father_method: function () {
+	      console.log("father");
+	    }
+	  }
+	});
+
+</script>
+</body>
+</html>
